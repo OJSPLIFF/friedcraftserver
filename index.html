@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Start Minecraft Server</title>
+    <script>
+        function startServer() {
+            fetch("http://your-mac-ip:5000/start-server")
+                .then(response => response.text())
+                .then(data => alert(data));
+        }
+    </script>
+</head>
+<body>
+    <h1>Minecraft Server Control</h1>
+    <button onclick="startServer()">Start Server</button>
+</body>
+</html>
