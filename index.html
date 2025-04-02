@@ -4,7 +4,7 @@
     <title>Start Minecraft Server</title>
     <script>
         function startServer() {
-            fetch("http://your-mac-ip:5000/start-server")
+            fetch("http://192.168.0.233:5000/start-server")
                 .then(response => response.text())
                 .then(data => alert(data));
         }
