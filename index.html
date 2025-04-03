@@ -1,17 +1,107 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Start Minecraft Server</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Friedcraft Launchpad</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: url('https://wallpapercave.com/wp/wp5126591.jpg') no-repeat center center fixed;
+            background-size: cover;
+            text-align: center;
+            color: white;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            background: rgba(0, 0, 0, 0.7);
+            padding: 30px;
+            border-radius: 10px;
+            width: 50%;
+            margin: 10% auto;
+            box-shadow: 0px 0px 15px rgba(255, 255, 255, 0.2);
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        .status {
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .status.online {
+            color: lime;
+        }
+        .status.offline {
+            color: red;
+        }
+        .btn {
+            background: #4CAF50;
+            color: white;
+            padding: 15px 30px;
+            font-size: 18px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .btn:hover {
+            background: #45a049;
+        }
+        .btn:disabled {
+            background: gray;
+            cursor: not-allowed;
+        }
+    </style>
     <script>
         function startServer() {
-            fetch("http://192.168.0.233:5000/start-server")
-                .then(response => response.text())
-                .then(data => alert(data));
+            let button = document.getElementById("startButton");
+            button.disabled = true;
+            button.innerText = "Starting...";
+
+            fetch("/start-server", { method: "POST" })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === "starting") {
+                        document.getElementById("status").innerText = "Starting...";
+                        document.getElementById("status").className = "status online";
+                    } else if (data.status === "already running") {
+                        document.getElementById("status").innerText = "Already Running!";
+                    } else {
+                        alert("Error: " + data.message);
+                    }
+                    setTimeout(() => {
+                        checkStatus();
+                        button.innerText = "Start Server";
+                        button.disabled = false;
+                    }, 5000);
+                });
         }
+
+        function checkStatus() {
+            fetch("/server-status")
+                .then(response => response.json())
+                .then(data => {
+                    let status = document.getElementById("status");
+                    if (data.running) {
+                        status.innerText = "Online";
+                        status.className = "status online";
+                    } else {
+                        status.innerText = "Offline";
+                        status.className = "status offline";
+                    }
+                });
+        }
+
+        setInterval(checkStatus, 10000); // Refresh status every 10 sec
+        window.onload = checkStatus; // Check status on page load
     </script>
 </head>
 <body>
-    <h1>Minecraft Server Control</h1>
-    <button onclick="startServer()">Start Server</button>
+    <div class="container">
+        <h1>Friedcraft Launchpad</h1>
+        <p class="status" id="status">Checking...</p>
+        <button class="btn" id="startButton" onclick="startServer()">Start Server</button>
+    </div>
 </body>
-</html>
